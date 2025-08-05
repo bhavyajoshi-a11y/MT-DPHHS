@@ -13,33 +13,36 @@ public with sharing class PersonSearchController {
      */
     @AuraEnabled(cacheable=false)
     public static SearchResult searchPersons(String lastName, Date dateOfBirth, String emailOrSSN) {
-        // Enhanced logging for community portal debugging
-        System.debug(LoggingLevel.ERROR, 'PersonSearchController.searchPersons - START');
-        System.debug(LoggingLevel.ERROR, 'Parameters - lastName: ' + lastName + ', dateOfBirth: ' + dateOfBirth + ', emailOrSSN: ' + emailOrSSN);
-        System.debug(LoggingLevel.ERROR, 'Running User: ' + UserInfo.getUserId() + ' - ' + UserInfo.getName());
-        System.debug(LoggingLevel.ERROR, 'User Type: ' + UserInfo.getUserType());
-        System.debug(LoggingLevel.ERROR, 'Profile: ' + UserInfo.getProfileId());
+        // Enhanced logging using DebugLogHelper for community portal debugging
+        DebugLogHelper.logUserContext('PersonSearchController', 'searchPersons');
+        
+        Map<String, Object> searchParams = new Map<String, Object>{
+            'lastName' => lastName,
+            'dateOfBirth' => dateOfBirth,
+            'emailOrSSN' => emailOrSSN
+        };
+        DebugLogHelper.logInfo('PersonSearchController', 'searchPersons', 'Search initiated with parameters', searchParams);
         
         SearchResult result = new SearchResult();
         
         try {
             // Validate required parameters
             if (String.isBlank(lastName)) {
-                System.debug(LoggingLevel.ERROR, 'Validation Error: Last Name is required');
+                DebugLogHelper.logError('PersonSearchController', 'searchPersons', 'Validation Error: Last Name is required');
                 result.isSuccess = false;
                 result.errorMessage = 'Last Name is required';
                 return result;
             }
             
             if (dateOfBirth == null) {
-                System.debug(LoggingLevel.ERROR, 'Validation Error: Date of Birth is required');
+                DebugLogHelper.logError('PersonSearchController', 'searchPersons', 'Validation Error: Date of Birth is required');
                 result.isSuccess = false;
                 result.errorMessage = 'Date of Birth is required';
                 return result;
             }
             
             if (String.isBlank(emailOrSSN)) {
-                System.debug(LoggingLevel.ERROR, 'Validation Error: Email or SSN is required');
+                DebugLogHelper.logError('PersonSearchController', 'searchPersons', 'Validation Error: Email or SSN is required');
                 result.isSuccess = false;
                 result.errorMessage = 'Email or SSN is required';
                 return result;
@@ -47,21 +50,20 @@ public with sharing class PersonSearchController {
             
             // Build dynamic SOQL query for exact matches
             String soqlQuery = buildSOQLQuery(lastName, dateOfBirth, emailOrSSN);
-            System.debug(LoggingLevel.ERROR, 'SOQL Query: ' + soqlQuery);
+            DebugLogHelper.logDebug('PersonSearchController', 'searchPersons', 'SOQL Query built', soqlQuery);
             
             // Execute query
             List<Person__c> persons = Database.query(soqlQuery);
-            System.debug(LoggingLevel.ERROR, 'Query Results Count: ' + persons.size());
+            DebugLogHelper.logInfo('PersonSearchController', 'searchPersons', 'Query executed successfully. Results count: ' + persons.size());
             
             // Transform results for LWC consumption
             result.persons = transformPersonData(persons);
             result.isSuccess = true;
             
-            System.debug(LoggingLevel.ERROR, 'PersonSearchController.searchPersons - SUCCESS');
+            DebugLogHelper.logInfo('PersonSearchController', 'searchPersons', 'Search completed successfully');
             
         } catch (Exception e) {
-            System.debug(LoggingLevel.ERROR, 'PersonSearchController.searchPersons - EXCEPTION: ' + e.getMessage());
-            System.debug(LoggingLevel.ERROR, 'Stack Trace: ' + e.getStackTraceString());
+            DebugLogHelper.logError('PersonSearchController', 'searchPersons', 'Exception occurred during search', e);
             
             result.isSuccess = false;
             result.errorMessage = 'An error occurred while searching. Please contact administrator.';
