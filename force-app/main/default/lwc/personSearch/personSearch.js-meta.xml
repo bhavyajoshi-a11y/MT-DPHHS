@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>58.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Person Search</masterLabel>
+    <description>A component for searching person records by last name, date of birth, and email or SSN with exact match criteria</description>
+    <targets>
+        <target>lightning__AppPage</target>
+        <target>lightning__HomePage</target>
+        <target>lightning__RecordPage</target>
+        <target>lightning__Tab</target>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__AppPage,lightning__HomePage,lightning__RecordPage,lightning__Tab">
+            <property name="height" type="Integer" default="600" label="Component Height (px)" description="Set the height of the component in pixels"/>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>
