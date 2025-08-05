@@ -1,0 +1,20 @@
+MT:DPHHS
+
+Create a LWC component with the given Information: Add separate fields for:
+
+Last Name
+
+Date Field - DOB
+
+Email or SSN - Only one will be provided
+
+Use exact match criteria on the backend on SOQL, the end user can have both fields on the search, and based on the provided values, we will search it.
+You can show the columns below in the table after the search
+
+Full Name
+
+Date of Birth
+
+Email Address
+
+SSN (Encrypted only last 4 digits shall appear)
