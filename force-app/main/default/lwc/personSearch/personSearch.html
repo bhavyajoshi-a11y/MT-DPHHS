@@ -1,0 +1,113 @@
+<template>
+    <lightning-card title="Person Search" icon-name="utility:search">
+        <div class="slds-p-around_medium">
+            <!-- Search Form -->
+            <div class="slds-grid slds-gutters slds-wrap">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                    <lightning-input
+                        type="text"
+                        label="Last Name *"
+                        value={lastName}
+                        onchange={handleLastNameChange}
+                        required
+                        placeholder="Enter last name">
+                    </lightning-input>
+                </div>
+                
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                    <lightning-input
+                        type="date"
+                        label="Date of Birth *"
+                        value={dateOfBirth}
+                        onchange={handleDateOfBirthChange}
+                        required>
+                    </lightning-input>
+                </div>
+                
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                    <lightning-input
+                        type="text"
+                        label="Email or SSN *"
+                        value={emailOrSSN}
+                        onchange={handleEmailOrSSNChange}
+                        required
+                        placeholder="Enter email or SSN">
+                    </lightning-input>
+                </div>
+            </div>
+            
+            <div class="slds-m-top_medium">
+                <lightning-button
+                    variant="brand"
+                    label="Search"
+                    onclick={handleSearch}
+                    disabled={isSearchDisabled}
+                    class="slds-m-right_small">
+                </lightning-button>
+                
+                <lightning-button
+                    variant="neutral"
+                    label="Clear"
+                    onclick={handleClear}>
+                </lightning-button>
+            </div>
+            
+            <!-- Loading Spinner -->
+            <template if:true={isLoading}>
+                <div class="slds-m-top_medium">
+                    <lightning-spinner
+                        alternative-text="Searching..."
+                        size="medium">
+                    </lightning-spinner>
+                </div>
+            </template>
+            
+            <!-- Error Message -->
+            <template if:true={errorMessage}>
+                <div class="slds-m-top_medium">
+                    <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+                        <span class="slds-assistive-text">Error</span>
+                        <span class="slds-icon_container slds-icon-utility-error slds-m-right_x-small">
+                            <lightning-icon icon-name="utility:error" size="x-small" variant="inverse"></lightning-icon>
+                        </span>
+                        <h2>{errorMessage}</h2>
+                    </div>
+                </div>
+            </template>
+            
+            <!-- Search Results -->
+            <template if:true={showResults}>
+                <div class="slds-m-top_large">
+                    <h3 class="slds-text-heading_small slds-m-bottom_medium">
+                        Search Results ({searchResults.length} found)
+                    </h3>
+                    
+                    <template if:true={hasResults}>
+                        <lightning-datatable
+                            key-field="fullName"
+                            data={searchResults}
+                            columns={columns}
+                            hide-checkbox-column="true"
+                            show-row-number-column="true">
+                        </lightning-datatable>
+                    </template>
+                    
+                    <template if:false={hasResults}>
+                        <div class="slds-text-align_center slds-p-around_large">
+                            <lightning-icon
+                                icon-name="utility:info"
+                                size="large"
+                                variant="inverse"
+                                class="slds-m-bottom_small">
+                            </lightning-icon>
+                            <p class="slds-text-heading_small">No records found</p>
+                            <p class="slds-text-body_regular slds-text-color_weak">
+                                Please check your search criteria and try again.
+                            </p>
+                        </div>
+                    </template>
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+</template>

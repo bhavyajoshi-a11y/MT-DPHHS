@@ -1,0 +1,141 @@
+/* Custom styles for Person Search component */
+
+.slds-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.slds-card__header {
+    background-color: #f3f3f3;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+/* Search form styling */
+.slds-grid.slds-gutters {
+    margin-bottom: 0;
+}
+
+.slds-input[required] {
+    border-left: 3px solid #1589ee;
+}
+
+.slds-input:focus {
+    border-color: #1589ee;
+    box-shadow: 0 0 3px rgba(21, 137, 238, 0.3);
+}
+
+/* Button styling */
+.slds-button_brand {
+    background-color: #1589ee;
+    border-color: #1589ee;
+    transition: all 0.2s ease;
+}
+
+.slds-button_brand:hover {
+    background-color: #0b5cab;
+    border-color: #0b5cab;
+    transform: translateY(-1px);
+}
+
+.slds-button_neutral {
+    transition: all 0.2s ease;
+}
+
+.slds-button_neutral:hover {
+    transform: translateY(-1px);
+}
+
+/* Loading spinner */
+.slds-spinner_container {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+/* Error message styling */
+.slds-alert_error {
+    border-radius: 4px;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Results section */
+.slds-text-heading_small {
+    color: #3e3e3c;
+    font-weight: 600;
+}
+
+/* Data table styling */
+.slds-table {
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.slds-table thead th {
+    background-color: #f8f9fa;
+    color: #3e3e3c;
+    font-weight: 600;
+    border-bottom: 2px solid #dddbda;
+}
+
+.slds-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* No results styling */
+.slds-text-align_center {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #dddbda;
+}
+
+.slds-text-color_weak {
+    color: #706e6b;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .slds-grid.slds-gutters .slds-col {
+        margin-bottom: 1rem;
+    }
+    
+    .slds-button {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .slds-button:last-child {
+        margin-bottom: 0;
+    }
+}
+
+/* Accessibility improvements */
+.slds-input:focus,
+.slds-button:focus {
+    outline: 2px solid #1589ee;
+    outline-offset: 2px;
+}
+
+/* Animation for results appearing */
+.slds-datatable {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
