@@ -1,0 +1,127 @@
+<template>
+    <lightning-card title="Exact Search" icon-name="standard:search">
+        <div class="slds-p-horizontal_medium">
+            <!-- Search Form -->
+            <div class="slds-grid slds-wrap slds-gutters slds-m-bottom_medium">
+                <!-- Last Name Field -->
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                    <lightning-input
+                        type="text"
+                        label="Last Name"
+                        value={lastName}
+                        onchange={handleLastNameChange}
+                        required>
+                    </lightning-input>
+                </div>
+
+                <!-- Date of Birth Field -->
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                    <lightning-input
+                        type="date"
+                        label="Date of Birth"
+                        value={dateOfBirth}
+                        onchange={handleDobChange}
+                        required>
+                    </lightning-input>
+                </div>
+
+                <!-- Email Field -->
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                    <lightning-input
+                        type="email"
+                        label="Email Address"
+                        value={email}
+                        onchange={handleEmailChange}
+                        placeholder="Enter email address">
+                    </lightning-input>
+                </div>
+
+                <!-- SSN Field -->
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                    <lightning-input
+                        type="text"
+                        label="Social Security Number"
+                        value={ssn}
+                        onchange={handleSsnChange}
+                        placeholder="Enter SSN"
+                        maxlength="11"
+                        pattern="[0-9]{3}-?[0-9]{2}-?[0-9]{4}">
+                    </lightning-input>
+                </div>
+            </div>
+
+            <!-- Search Button -->
+            <div class="slds-text-align_center slds-m-bottom_medium">
+                <lightning-button
+                    variant="brand"
+                    label="Search"
+                    onclick={handleSearch}
+                    disabled={isSearchDisabled}
+                    class="slds-m-right_small">
+                </lightning-button>
+                <lightning-button
+                    variant="neutral"
+                    label="Clear"
+                    onclick={handleClear}>
+                </lightning-button>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div if:true={isLoading} class="slds-text-align_center slds-m-vertical_medium">
+                <lightning-spinner alternative-text="Searching..." size="medium"></lightning-spinner>
+            </div>
+
+            <!-- Search Results Table -->
+            <div if:true={showResults} class="slds-m-top_medium">
+                <div class="slds-text-heading_medium slds-m-bottom_small">
+                    Search Results ({searchResults.length} found)
+                </div>
+                
+                <lightning-datatable
+                    key-field="Id"
+                    data={searchResults}
+                    columns={columns}
+                    hide-checkbox-column="true"
+                    show-row-number-column="true"
+                    resize-column-disabled="false"
+                    sorted-by={sortedBy}
+                    sorted-direction={sortedDirection}
+                    onsort={handleSort}>
+                </lightning-datatable>
+            </div>
+
+            <!-- No Results Message -->
+            <div if:true={showNoResults} class="slds-text-align_center slds-m-vertical_medium">
+                <div class="slds-illustration slds-illustration_small">
+                    <div class="slds-text-color_weak">
+                        <h3 class="slds-text-heading_medium">No Records Found</h3>
+                        <p class="slds-text-body_regular">
+                            Please verify your search criteria and try again.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            <div if:true={errorMessage} class="slds-m-top_medium">
+                <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error" role="alert">
+                    <span class="slds-assistive-text">Error</span>
+                    <h2>{errorMessage}</h2>
+                </div>
+            </div>
+
+            <!-- Search Criteria Info -->
+            <div if:true={showSearchInfo} class="slds-m-top_medium">
+                <div class="slds-box slds-theme_shade slds-text-body_small">
+                    <strong>Search Criteria:</strong>
+                    <ul class="slds-list_dotted slds-m-top_xx-small">
+                        <li if:true={lastName}>Last Name: {lastName}</li>
+                        <li if:true={dateOfBirth}>Date of Birth: {formattedDob}</li>
+                        <li if:true={email}>Email: {email}</li>
+                        <li if:true={ssn}>SSN: {maskedSsn}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </lightning-card>
+</template>
