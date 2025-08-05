@@ -5,7 +5,8 @@ import searchPersons from '@salesforce/apex/PersonSearchController.searchPersons
 export default class PersonSearch extends LightningElement {
     @track lastName = '';
     @track dateOfBirth = '';
-    @track emailOrSSN = '';
+    @track email = '';
+    @track ssn = '';
     @track searchResults = [];
     @track errorMessage = '';
     @track isLoading = false;
@@ -41,7 +42,7 @@ export default class PersonSearch extends LightningElement {
 
     // Getters for computed properties
     get isSearchDisabled() {
-        return !this.lastName || !this.dateOfBirth || !this.emailOrSSN || this.isLoading;
+        return !this.lastName || !this.dateOfBirth || (!this.email && !this.ssn) || this.isLoading;
     }
 
     get hasResults() {
@@ -59,8 +60,13 @@ export default class PersonSearch extends LightningElement {
         this.clearError();
     }
 
-    handleEmailOrSSNChange(event) {
-        this.emailOrSSN = event.target.value;
+    handleEmailChange(event) {
+        this.email = event.target.value;
+        this.clearError();
+    }
+
+    handleSSNChange(event) {
+        this.ssn = event.target.value;
         this.clearError();
     }
 
@@ -78,7 +84,8 @@ export default class PersonSearch extends LightningElement {
             const results = await searchPersons({
                 lastName: this.lastName.trim(),
                 dateOfBirth: this.dateOfBirth,
-                emailOrSSN: this.emailOrSSN.trim()
+                email: this.email?.trim() || null,
+                ssn: this.ssn?.trim() || null
             });
 
             this.searchResults = results || [];
@@ -110,7 +117,8 @@ export default class PersonSearch extends LightningElement {
     handleClear() {
         this.lastName = '';
         this.dateOfBirth = '';
-        this.emailOrSSN = '';
+        this.email = '';
+        this.ssn = '';
         this.searchResults = [];
         this.errorMessage = '';
         this.showResults = false;
@@ -147,25 +155,28 @@ export default class PersonSearch extends LightningElement {
         } else if (!this.dateOfBirth) {
             this.errorMessage = 'Date of Birth is required';
             isValid = false;
-        } else if (!this.emailOrSSN?.trim()) {
-            this.errorMessage = 'Email or SSN is required';
+        } else if (!this.email?.trim() && !this.ssn?.trim()) {
+            this.errorMessage = 'Either Email Address or SSN is required';
             isValid = false;
-        } else if (!this.isValidEmailOrSSN(this.emailOrSSN.trim())) {
-            this.errorMessage = 'Please enter a valid email address or SSN (9 digits)';
+        } else if (this.email?.trim() && !this.isValidEmail(this.email.trim())) {
+            this.errorMessage = 'Please enter a valid email address';
+            isValid = false;
+        } else if (this.ssn?.trim() && !this.isValidSSN(this.ssn.trim())) {
+            this.errorMessage = 'Please enter a valid SSN (9 digits)';
             isValid = false;
         }
 
         return isValid;
     }
 
-    // Email/SSN validation helper
-    isValidEmailOrSSN(value) {
-        // Check if it's an email
+    // Email validation helper
+    isValidEmail(value) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (emailRegex.test(value)) {
-            return true;
-        }
+        return emailRegex.test(value);
+    }
 
+    // SSN validation helper
+    isValidSSN(value) {
         // Check if it's a valid SSN (9 digits, with or without formatting)
         const ssnRegex = /^\d{3}-?\d{2}-?\d{4}$/;
         const cleanValue = value.replace(/\D/g, '');

@@ -3,7 +3,7 @@
         <div class="slds-p-around_medium">
             <!-- Search Form -->
             <div class="slds-grid slds-gutters slds-wrap">
-                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-4">
                     <lightning-input
                         type="text"
                         label="Last Name *"
@@ -14,7 +14,7 @@
                     </lightning-input>
                 </div>
                 
-                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-4">
                     <lightning-input
                         type="date"
                         label="Date of Birth *"
@@ -24,15 +24,30 @@
                     </lightning-input>
                 </div>
                 
-                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-4">
+                    <lightning-input
+                        type="email"
+                        label="Email Address"
+                        value={email}
+                        onchange={handleEmailChange}
+                        placeholder="Enter email address">
+                    </lightning-input>
+                </div>
+                
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-4">
                     <lightning-input
                         type="text"
-                        label="Email or SSN *"
-                        value={emailOrSSN}
-                        onchange={handleEmailOrSSNChange}
-                        required
-                        placeholder="Enter email or SSN">
+                        label="SSN"
+                        value={ssn}
+                        onchange={handleSSNChange}
+                        placeholder="Enter SSN (123-45-6789)">
                     </lightning-input>
+                </div>
+            </div>
+            
+            <div class="slds-m-top_small">
+                <div class="slds-text-body_small slds-text-color_weak">
+                    * Required fields. At least one of Email Address or SSN must be provided.
                 </div>
             </div>
             

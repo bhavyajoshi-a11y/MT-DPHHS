@@ -16,7 +16,8 @@ A Lightning Web Component (LWC) for searching person records with exact match cr
 ### Required Fields
 - **Last Name**: Text field for exact last name match
 - **Date of Birth**: Date picker for exact date match
-- **Email or SSN**: Text field accepting either email address or SSN
+- **Email Address**: Email field (optional, but either Email or SSN must be provided)
+- **SSN**: Text field for Social Security Number (optional, but either Email or SSN must be provided)
 
 ### Display Columns
 The search results table displays:
@@ -76,7 +77,9 @@ The search results table displays:
 1. **Enter Search Criteria**:
    - Last Name (required)
    - Date of Birth (required)
-   - Email OR SSN (required - only one needed)
+   - Email Address (optional)
+   - SSN (optional)
+   - At least one of Email Address or SSN must be provided
 
 2. **Click Search**: The component will perform an exact match query
 
@@ -86,9 +89,10 @@ The search results table displays:
 
 ### Search Logic
 
-The component automatically detects whether the "Email or SSN" field contains:
-- **Email**: If the value contains an '@' symbol
-- **SSN**: If the value contains only digits (with or without formatting)
+The component accepts separate fields for Email and SSN:
+- **Email Address**: Validates email format and searches exact match on Email__c field
+- **SSN**: Accepts formatted (123-45-6789) or unformatted (123456789) input, searches exact match on SSN__c field
+- **Combined Search**: If both Email and SSN are provided, searches for records matching either criteria
 
 ## Security Features
 
@@ -103,11 +107,30 @@ The component automatically detects whether the "Email or SSN" field contains:
 The component uses exact match SOQL queries:
 
 ```sql
+-- Example queries based on input:
+
+-- Email only:
 SELECT Id, FirstName, LastName, Date_of_Birth__c, Email__c, SSN__c 
 FROM Person__c 
 WHERE LastName = :lastName 
 AND Date_of_Birth__c = :dateOfBirth 
-AND (Email__c = :email OR SSN__c = :ssn)
+AND Email__c = :email
+LIMIT 50
+
+-- SSN only:
+SELECT Id, FirstName, LastName, Date_of_Birth__c, Email__c, SSN__c 
+FROM Person__c 
+WHERE LastName = :lastName 
+AND Date_of_Birth__c = :dateOfBirth 
+AND SSN__c = :cleanSSN
+LIMIT 50
+
+-- Both Email and SSN:
+SELECT Id, FirstName, LastName, Date_of_Birth__c, Email__c, SSN__c 
+FROM Person__c 
+WHERE LastName = :lastName 
+AND Date_of_Birth__c = :dateOfBirth 
+AND (Email__c = :email OR SSN__c = :cleanSSN)
 LIMIT 50
 ```
 
@@ -132,8 +155,9 @@ To add additional search fields:
 
 1. Add the field to the `Person__c` object
 2. Update the SOQL query in `PersonSearchController.cls`
-3. Add the input field to `personSearch.html`
+3. Add the input field to `personSearch.html` 
 4. Add the corresponding JavaScript handlers in `personSearch.js`
+5. Update the grid layout classes for responsive design
 
 ### Styling Customization
 Modify `personSearch.css` to change:

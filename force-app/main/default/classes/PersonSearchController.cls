@@ -31,27 +31,35 @@ public with sharing class PersonSearchController {
     }
     
     @AuraEnabled(cacheable=false)
-    public static List<PersonRecord> searchPersons(String lastName, Date dateOfBirth, String emailOrSSN) {
+    public static List<PersonRecord> searchPersons(String lastName, Date dateOfBirth, String email, String ssn) {
         try {
             List<PersonRecord> results = new List<PersonRecord>();
             
             // Validate inputs
-            if (String.isBlank(lastName) || dateOfBirth == null || String.isBlank(emailOrSSN)) {
-                throw new AuraHandledException('Please provide Last Name, Date of Birth, and either Email or SSN');
+            if (String.isBlank(lastName) || dateOfBirth == null) {
+                throw new AuraHandledException('Please provide Last Name and Date of Birth');
             }
             
-            // Determine if emailOrSSN is an email or SSN
-            Boolean isEmail = emailOrSSN.contains('@');
+            if (String.isBlank(email) && String.isBlank(ssn)) {
+                throw new AuraHandledException('Please provide either Email or SSN');
+            }
             
             String query = 'SELECT Id, FirstName, LastName, Date_of_Birth__c, Email__c, SSN__c FROM Person__c WHERE LastName = :lastName AND Date_of_Birth__c = :dateOfBirth';
             
-            if (isEmail) {
-                query += ' AND Email__c = :emailOrSSN';
-            } else {
-                // For SSN, remove any formatting and do exact match
-                String cleanSSN = emailOrSSN.replaceAll('\\D', '');
+            // Build query based on provided fields
+            if (!String.isBlank(email) && !String.isBlank(ssn)) {
+                // Both email and SSN provided
+                String cleanSSN = ssn.replaceAll('\\D', '');
+                query += ' AND (Email__c = :email OR SSN__c = :cleanSSN)';
+                ssn = cleanSSN;
+            } else if (!String.isBlank(email)) {
+                // Only email provided
+                query += ' AND Email__c = :email';
+            } else if (!String.isBlank(ssn)) {
+                // Only SSN provided
+                String cleanSSN = ssn.replaceAll('\\D', '');
                 query += ' AND SSN__c = :cleanSSN';
-                emailOrSSN = cleanSSN;
+                ssn = cleanSSN;
             }
             
             query += ' LIMIT 50';
