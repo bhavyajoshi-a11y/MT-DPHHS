@@ -13,19 +13,20 @@ import {
     validatePhoneNumberWithParenthesis, isInputValid, isNumberOnly, maskSSNNumber, getMinDateFor18YearsOld, wiredZipCodeCounties
 } from "c/cc_Util";
 import { getPicklistValues, getObjectInfo } from 'lightning/uiObjectInfoApi';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 import CC_CONTACT_ROLE_RELATIONSHIP_OBJECT from "@salesforce/schema/CC_Contact_Role_Relationship__c";
 import RACE_FIELD from "@salesforce/schema/CC_Contact_Role_Relationship__c.CC_Race_Origin__c";
 import searchMembersDemographicInputs from '@salesforce/apex/CC_ApplicationController.searchMembersDemographicInputs';
 //import SUFFIX_FIELD from "@salesforce/schema/Account.Suffix__c";
 //import ACCOUNT from '@salesforce/schema/Account';
-export default class CcAddFacilityPersonaInformation extends LightningElement {
+export default class AddFacilityPersonInformation extends LightningElement {
     @api currentUserDetails = {};
     @api personaType;
     @api countyPicklistOptions;
     @api zipCodeCountyMap = [];
-    @api countriesToStates;
-    @api countries;
+    @api countriesToStates = {};
+    @api countries = [];
     @api readOnly = false;
     @api savedPersonInformation;
     @api secName = '';
@@ -160,8 +161,8 @@ export default class CcAddFacilityPersonaInformation extends LightningElement {
                                                                                console.log('searchParams ==> ',JSON.stringify(searchParams));
                               searchMembersDemographicInputs({ searchParams: searchParams }).then(res => {
                                 console.log('res',res);
-                                 this.ownershipRecord.contactList = res;
-                                     this.ownershipRecord.contactList.forEach(data => {
+                                 this.ownershipRecords = Array.isArray(res) ? res : (res?.contactList || []);
+                                     this.ownershipRecords.forEach(data => {
                              if (data.dateOfBirth) {
                                 const [year, month, day] = data.dateOfBirth.split('-'); // Split the date into parts
                                 data.formatedDob = `${month}/${day}/${year}`; // Rearrange into MM/DD/YYYY
@@ -173,10 +174,14 @@ export default class CcAddFacilityPersonaInformation extends LightningElement {
                         });
                         
                     }).catch(err => {
-                        showErrorMessage(this, err.body.message || err.message || err);
-                    }).finally(err => {
+                        const message = err?.body?.message || err?.message || err || 'Unknown error';
+                        this.dispatchEvent(new ShowToastEvent({ title: 'Error', message, variant: 'error' }));
+                        // Also log for debugging
+                        // eslint-disable-next-line no-console
+                        console.error('Search error:', err);
+                    }).finally(() => {
                        // this.showSpinner = false;
-                        this.noRecordFound = this.ownershipRecord.contactList.length == 0;
+                        this.noRecordFound = (this.ownershipRecords?.length || 0) === 0;
                     });
      }
 
@@ -344,7 +349,7 @@ export default class CcAddFacilityPersonaInformation extends LightningElement {
     handleBillingCountyApt(event) {
         this.personInformation.physicalAddress[event.target.name] = event.target.value;
         console.log('here in handleBillingCountyApt address')
-        const inputEvent = new CustomEvent('inputchange', { detail: { personaType: this.personaType,personInformation : this.personInformation,  eventName : 'mailingAddress' ,eventValue : '' } });
+        const inputEvent = new CustomEvent('inputchange', { detail: { personaType: this.personaType,personInformation : this.personInformation,  eventName : 'physicalAddress' ,eventValue : '' } });
         this.dispatchEvent(inputEvent);   
     }
 
@@ -539,7 +544,7 @@ export default class CcAddFacilityPersonaInformation extends LightningElement {
             { label: 'IV', value: 'IV' },
             { label: 'V', value: 'V' },
             { label: 'VI', value: 'VI' },
-            { label: 'VII', value: 'III' },
+            { label: 'VII', value: 'VII' },
         ];
     }
     
@@ -578,15 +583,15 @@ export default class CcAddFacilityPersonaInformation extends LightningElement {
     }
 
     get countryPicklistValueOptions() {
-        return this.countries;
+        return this.countries || [];
     }
 
     get billingStatePicklistValueOptions() {
-        return this.countriesToStates['US'] || [];
+        return (this.countriesToStates && this.countriesToStates['US']) || [];
     }
 
     get mailingStatePicklistValueOptions() {
-        return this.countriesToStates['US'] || [];
+        return (this.countriesToStates && this.countriesToStates['US']) || [];
     }
 
 
