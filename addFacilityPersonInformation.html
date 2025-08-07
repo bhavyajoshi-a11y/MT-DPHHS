@@ -1,0 +1,418 @@
+
+<!--
+  @description       : 
+  @author            : Sai Vardhan Kandukuri
+  @group             : 
+  @last modified on  : 08-08-2025
+  @last modified by  : Bhavya Joshi
+-->
+<template>
+   
+    <template if:false={readOnly}>
+            <div class="slds-scoped-notification slds-media slds-media_center slds-theme_info m-b-medium m-t-medium" role="status">
+            <div class="slds-media__figure">
+                <span class="slds-icon_container slds-icon-utility-info" title="info">
+                    <i class="material-icon material-icon-info_outline"></i>
+                </span>
+            </div>
+            <div class="slds-media__body">
+                <p class="text-primary">This information is optional at this time. But would be required at the time of submitting a Licensing Application.</p>
+            </div>
+        </div>
+        <div class="slds-grid slds-gutters slds-wrap">
+            <div class="slds-col slds-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12" if:true={showLoggedInUser}>
+                <div class="cc-col-field-values">
+                    <lightning-input name="loggedInUser" type="checkbox" label={loggedInUserLabel}
+                         disabled={editModeDisabled} onchange={handleLoggedInUser}>
+                         <!-- checked={facilityInformation.loggedInUserOwner} -->
+                    </lightning-input>
+                </div>
+            </div>
+            </div>
+            <div class="slds-grid slds-gutters slds-wrap">
+            <template if:false={isCoOwner}>
+                <div class="slds-col slds-size_12-of-12 slds-medium-size_12-of-12 slds-large-size_12-of-12">
+                    <!-- <c-cc-add-facility-account-lookup onaccountselect={handleAccountSelection} onaccountremoved={handleAccountRemove} disabled={disableOwnerSearch}></c-cc-add-facility-account-lookup> -->
+                     <!--Added code for Exact search functionality-->
+                    <div class="slds-grid slds-wrap slds-gutters slds-m-bottom_medium">
+                                                            <!-- Last Name Field -->
+                                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                                                                <lightning-input
+                                                                    type="text"
+                                                                    label="Last Name"
+                                                                    value={lastName}
+                                                                    onchange={handleLastNameChange}
+                                                                    required>
+                                                                </lightning-input>
+                                                            </div>
+
+                                                            <!-- Date of Birth Field -->
+                                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                                                                <lightning-input
+                                                                    type="date"
+                                                                    label="Date of Birth"
+                                                                    value={dateOfBirth}
+                                                                    onchange={handleDobChange}
+                                                                    required>
+                                                                </lightning-input>
+                                                            </div>
+
+                                                            <!-- Email Field -->
+                                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                                                                <lightning-input
+                                                                    type="email"
+                                                                    label="Email Address"
+                                                                    value={email}
+                                                                    onchange={handleEmailChange}
+                                                                    placeholder="Enter email address">
+                                                                </lightning-input>
+                                                            </div>
+
+                                                            <!-- SSN Field -->
+                                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                                                                <lightning-input
+                                                                    type="text"
+                                                                    label="Social Security Number"
+                                                                    value={ssn}
+                                                                    onchange={handleSsnChange}
+                                                                    placeholder="Enter SSN"
+                                                                    maxlength="10"
+                                                                    pattern="[0-9]{3}-?[0-9]{3}-?[0-9]{4}">
+                                                                </lightning-input>
+                                                            </div>
+                    </div>
+                     <!-- <lightning-button variant="brand-outline" label="Reset" title="Reset"
+                        onclick={resetSearchInputs} class="m-r-small"></lightning-button> -->
+                        <lightning-button variant="brand" label="Search" title="Search"
+                        onclick={handleSearch}></lightning-button>
+                </div>
+               
+            </template>
+            <div class="slds-col slds-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12">
+                <div class="cc-col-field-values">
+                    <lightning-input name="firstName" class="namefield" type="text" label="First Name" value={personInformation.firstName} placeholder="Enter First Name"
+                        onchange={handleChange}  disabled={disableFields} required>
+                    </lightning-input>
+                </div>
+            </div>
+            <div class="slds-col slds-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12">
+                <div class="cc-col-field-values">
+                    <lightning-input name="middleName" type="text" label="Middle Name" value={personInformation.middleName} placeholder="Enter Middle Name"
+                        onchange={handleChange} disabled={disableFields}>
+                    </lightning-input>
+                </div>
+            </div>
+            <div class="slds-col slds-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12">
+                <div class="cc-col-field-values">
+                    <lightning-input name="lastName" class="namefield" type="text" label="Last Name" value={personInformation.lastName} placeholder="Enter Last Name"
+                        onchange={handleChange}  disabled={disableFields} required>
+                    </lightning-input>
+                </div>
+            </div>
+            <div class="slds-col slds-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12">
+                <div if:true={isDirector} class="cc-col-field-values">
+                    <!-- <lightning-input name="suffix" type="text" label="Suffix" value={personInformation.suffix} placeholder="Enter Suffix"
+                        onchange={handleChange}  disabled={disableFields}>
+                    </lightning-input> -->
+                    <lightning-combobox name="suffix" type="text" label="Suffix" value={personInformation.suffix} placeholder="Enter Suffix" options={suffixOptions}
+                        onchange={handleChange}  disabled={disableFields}>
+                    </lightning-combobox>
+                </div>
+            </div>
+        </div>
+    
+    
+        <div class="slds-grid slds-wrap slds-gutters">
+            <div class="slds-col slds-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12">
+                <lightning-input type="date" name="dateOfBirth" label="Date of Birth"
+                    onchange={handleChange} placeholder="MM/DD/YYYY" 
+                    value={personInformation.dateOfBirth} date-style="short" max={minDateForAge}
+                    disabled={disableAllFields}></lightning-input>
+            </div>
+            <div class="slds-col slds-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12">
+                <lightning-input type="text" name="ssn" label="SSN" max-length="11" 
+                    onchange={handleChange} placeholder="Enter SSN"
+                    data-id="SSN" onkeydown={isNumberOnlyFromComp} value={personInformation.ssn}
+                    disabled={disableAllFields} class="modal-input"></lightning-input>
+            </div>
+            <div class="slds-col slds-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12">
+                <lightning-combobox type="text" name="gender" label="Gender" options={genderOptions}
+                    onchange={handleChange} placeholder="Select Gender"
+                    value={personInformation.gender} disabled={disableAllFields}></lightning-combobox>
+            </div>
+            <div class="slds-col slds-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12">
+                <lightning-combobox type="text" name="ethnicity" label="Ethnicity"
+                    options={ethnicityOptions} onchange={handleChange} placeholder="Select Ethnicity"
+                    value={personInformation.ethnicity} disabled={disableAllFields}></lightning-combobox>
+            </div>    
+            
+            <div class="slds-col slds-size_12-of-12">
+                <!-- <lightning-combobox type="text" name="race" label="Race" options={raceOptions}
+                    onchange={handleChange} placeholder="Select Race" value={personInformation.race}
+                    disabled={disableAllFields}></lightning-combobox> -->
+                    <lightning-checkbox-group name="race"
+                    label="Race"
+                    options={raceOptions}
+                    value={raceCheck} class="namefield"
+                    onchange={handleChange} required message-when-value-missing="Complete this field"></lightning-checkbox-group>
+            </div>
+        </div>
+    
+        <div class="slds-grid slds-gutters slds-wrap">
+            <div class="slds-col slds-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12">
+                <div class="cc-col-field-values">
+                    <lightning-input name="emailAddress" type="email" label="Email Address" value={personInformation.emailAddress}
+                       placeholder="Enter Email Address" onchange={handleChange}  disabled={disableFields} required>
+                    </lightning-input>
+                </div>
+            </div>
+            <div class="slds-col slds-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12">
+                <div class="cc-col-field-values">
+                    <lightning-radio-group data-name="emailType" label="Email Type" options={emailTypeOptions} class="radio-group m-b-medium"
+                        value={personInformation.emailType} type="radio" onchange={handleChange} disabled={disableAllFields}>
+                    </lightning-radio-group>
+                </div>
+            </div>
+        </div>
+        <div class="slds-grid slds-gutters slds-wrap">
+            <div class="slds-col slds-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12">
+                <div class="cc-col-field-values">
+                    <lightning-input name="phone" class="namefield" type="phone" label="Phone Number" value={personInformation.phone} 
+                        onchange={handleChange} placeholder="Enter Phone Number" required disabled={disableAllFields} pattern="^\(\d{3}\) \d{3}-\d{4}$" message-when-pattern-mismatch="Enter a Valid Phone Number">
+                    </lightning-input>
+                </div>
+            </div>
+            <div class="slds-col slds-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12">
+                <div class="cc-col-field-values">
+                    <lightning-radio-group  data-name="phoneType" label="Phone Number Type" options={phoneTypeOptions} class="radio-group m-b-medium"
+                        value={personInformation.phoneType} type="radio" onchange={handleChange} disabled={disableAllFields}>
+                    </lightning-radio-group>
+                </div>
+            </div>
+        </div>
+        <div class="slds-grid slds-gutters slds-wrap">
+            <div class="slds-col slds-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12">
+                <div class="cc-col-field-values">
+                    <lightning-input name="altPhone" type="phone" label="Alternate Phone Number" value={personInformation.altPhone}
+                        onchange={handleChange} placeholder="Enter Alternate Phone Number" disabled={disableAllFields} pattern="^\(\d{3}\) \d{3}-\d{4}$" message-when-pattern-mismatch="Enter a Valid Phone Number">
+                    </lightning-input>
+                </div>
+            </div>
+            <div class="slds-col slds-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12">
+                <div class="cc-col-field-values">
+                    <lightning-radio-group data-name="altPhoneType" label="Alternate Phone Number Type" options={phoneTypeOptions} class="radio-group m-b-medium"
+                    value={personInformation.altPhoneType} type="radio" onchange={handleChange} disabled={disableAllFields}>
+                    </lightning-radio-group>
+                </div>
+            </div>
+        </div>
+    
+    
+        <div class="slds-grid slds-wrap slds-gutters">
+            <div class="slds-col slds-size_12-of-12">
+                <h3 class="m-b-small m-t-medium">Physical Address </h3>
+            </div>
+            <div class="slds-col slds-size_12-of-12">
+                <span>
+                    <div class="slds-col slds-size_12-of-12">
+                        Search Address
+                    </div>
+                    <div class="input-group">
+                        <lightning-input-address class="m-b-0 address-lookup" data-id="billingAddress"
+                            address-lookup-placeholder="Search Address Here"
+                            street-placeholder='Enter Street'
+                                        city-placeholder='Enter City'
+                                        province-placeholder='Enter State'
+                                        postal-code-placeholder='Enter Zip Code'
+                                        state-placeholder='Select State'
+                                        country-label="Country" 
+                            street-label="Street Address" city-label="City"
+                            province-label="State" postal-code-pattern="^[0-9]{5}$"
+                            postal-code-maxlength='5' postal-code-label="Zip Code"
+                            country-options={countryPicklistValueOptions}
+                           street={personInformation.physicalAddress.street} city={personInformation.physicalAddress.city}
+                            province={personInformation.physicalAddress.state} postal-code={personInformation.physicalAddress.zip}
+                            show-address-lookup onchange={handleBillingAddress}
+                            disabled={disableAllFields} 
+                            province-options={billingStatePicklistValueOptions} country="US" country-disabled
+                           >
+                        </lightning-input-address>
+                    </div>
+                </span>
+            </div>
+            <div class=" slds-col slds-size_12-of-12 slds-medium-size_4-of-12 slds-large-size_4-of-12 ">
+                <lightning-input type="text" label="Apt/Suite" data-id="billingAptSuite" name="aptSuite" placeholder="Enter Apartment, Suite"
+                    value={personInformation.physicalAddress.aptSuite} onchange={handleBillingCountyApt}
+                    disabled={disableAllFields}></lightning-input>
+            </div>
+            <div class=" slds-col slds-size_12-of-12 slds-medium-size_4-of-12 slds-large-size_4-of-12 ">
+                <lightning-combobox name="county" label="County" value={personInformation.physicalAddress.county} placeholder="Select County"
+                    options={countyPicklistOptions} onchange={handleBillingCountyApt}
+                    disabled={disableAllFields}></lightning-combobox>
+            </div>
+        </div>
+    
+        <div class="slds-grid slds-wrap slds-gutters">
+            <div class="slds-col slds-large-size_12-of-12">
+                <h3 class="m-b-small m-t-medium">Mailing Address</h3>
+            </div>
+            <div class="slds-col slds-large-size_12-of-12">
+                <lightning-input type="checkbox" label="Mailing Address is same as Physical Address"
+                    disabled={disableAllFields} name="mailingAddressSame"
+                    checked={personInformation.mailingAddressSame}
+                    onchange={handleMailingSame}>
+                </lightning-input>
+            </div>
+            <!-- <div class="slds-col slds-large-size_12-of-12" if:true={showMailingAddress}> -->
+            <div class="slds-col slds-large-size_12-of-12" if:false={personInformation.mailingAddressSame}>
+                <span>
+                    <div class="slds-col slds-size_12-of-12">
+                        Search Address
+                    </div>
+                    <div class="input-group">
+                        <lightning-input-address class="m-b-0 address-lookup" data-id="mailingAddress"
+                            address-lookup-placeholder="Search Address Here"    
+                            street-placeholder='Enter Street'
+                                        city-placeholder='Enter City'
+                                        province-placeholder='Enter State'
+                                        postal-code-placeholder='Enter Zip Code'
+                                        state-placeholder='Select State'
+                                        country-label="Country"
+                            street-label="Street Address" city-label="City"
+                            province-label="State" postal-code-pattern="^[0-9]{5}$"
+                            postal-code-maxlength='5' postal-code-label="Zip Code"
+                            country-options={countryPicklistValueOptions}
+                             street={personInformation.mailingAddress.street} city={personInformation.mailingAddress.city}
+                            province={personInformation.mailingAddress.state} postal-code={personInformation.mailingAddress.zip}
+                            show-address-lookup onchange={handleMailingAddress} country="US"
+                            disabled={disableAllFields} country-disabled
+                            province-options={billingStatePicklistValueOptions}
+                            >
+                        </lightning-input-address>
+    
+                    </div>
+                </span>
+    
+            </div>
+            <div if:false={personInformation.mailingAddressSame}
+                class=" slds-col slds-size_12-of-12 slds-medium-size_4-of-12 slds-large-size_4-of-12 ">
+                <lightning-input type="text" label='Apt/Suite' name="aptSuite" placeholder="Enter Apartment, Suite"
+                    value={personInformation.mailingAddress.aptSuite} onchange={handleMailingCountyApt}
+                    disabled={disableAllFields}></lightning-input>
+            </div>
+            <div if:false={personInformation.mailingAddressSame}
+                class=" slds-col slds-size_12-of-12 slds-medium-size_4-of-12 slds-large-size_4-of-12">
+                <lightning-combobox name="county" label="County" data-id="MailingAddress"
+                    value={personInformation.mailingAddress.county} placeholder="Select County"
+                    options={countyPicklistOptions} onchange={handleMailingCountyApt}
+                    disabled={disableAllFields}></lightning-combobox>
+            </div>
+        </div>
+    
+    
+        <template if:true={isCoOwner}>
+            <div class="slds-grid slds-gutters slds-wrap">
+                <div class="slds-col slds-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_3-of-12">
+                    <label>If the co-owner has Portal Access?</label>
+                </div>
+                <div class="slds-col slds-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12">
+                    <div class="slds-form-element m-b-0">
+                        <label class="slds-checkbox_toggle slds-grid">
+                            <input type="checkbox" name="hasPortalAccess"
+                                aria-describedby="checkbox-toggle-18"
+                                onchange={handleChange} 
+                                />
+                            <span id="isCoOwnerPortalUser"
+                                class="slds-checkbox_faux_container"
+                                aria-live="assertive">
+                                <span class="slds-checkbox_faux"></span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </template>
+        <!-- <div class="slds-scoped-notification slds-media slds-media_center slds-theme_info m-b-medium m-t-medium" role="status">
+            <div class="slds-media__figure">
+                <span class="slds-icon_container slds-icon-utility-info" title="info">
+                    <i class="material-icon material-icon-info_outline"></i>
+                </span>
+            </div>
+            <div class="slds-media__body">
+                <p class="text-primary">This information is optional at this time. But would be required at the time of submitting a Licensing Application.</p>
+            </div>
+        </div> -->
+    </template>
+
+    
+    <template if:true={readOnly}>
+        <div class="slds-grid slds-gutters slds-wrap">
+            <div class="slds-col slds-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12">
+                <div class="cc-col-field-values">
+                    <lightning-input name="firstName" type="text" label="First Name" value={personInformation.firstName} disabled></lightning-input>
+                </div>
+            </div>
+            <div class="slds-col slds-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12">
+                <div class="cc-col-field-values">
+                    <lightning-input name="middleName" type="text" label="Middle Name" value={personInformation.middleName} disabled></lightning-input>
+                </div>
+            </div>
+            <div class="slds-col slds-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12">
+                <div class="cc-col-field-values">
+                    <lightning-input name="lastName" type="text" label="Last Name" value={personInformation.lastName} disabled></lightning-input>
+                </div>
+            </div>
+            <div if:true={isDirector} class="slds-col slds-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12">
+                <div class="cc-col-field-values">
+                    <lightning-input name="suffix" type="text" label="Suffix" value={personInformation.suffix} disabled></lightning-input>
+                </div>
+            </div>
+        </div>
+        <div class="slds-grid slds-gutters slds-wrap">
+            <div class="slds-col slds-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12">
+                <div class="cc-col-field-values">
+                    <lightning-input name="emailAddress" type="email" label="Email Address" value={personInformation.emailAddress} disabled></lightning-input>
+                </div>
+            </div>
+            <div class="slds-col slds-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12">
+                <div class="cc-col-field-values">
+                    <lightning-radio-group label="Email Type" options={emailTypeOptions} class="radio-group m-b-medium"
+                        value={personInformation.emailType} type="radio" disabled>
+                    </lightning-radio-group>
+                </div>
+            </div>
+        </div>
+        <div class="slds-grid slds-gutters slds-wrap">
+            <div class="slds-col slds-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12">
+                <div class="cc-col-field-values">
+                    <lightning-input name="phone" type="phone" label="Phone Number" value={personInformation.phone}
+                        disabled>
+                    </lightning-input>
+                </div>
+            </div>
+            <div class="slds-col slds-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12">
+                <div class="cc-col-field-values">
+                    <lightning-radio-group label="Phone Number Type" options={phoneTypeOptions} class="radio-group m-b-medium"
+                        value={personInformation.phoneType} type="radio" disabled>
+                    </lightning-radio-group>
+                </div>
+            </div>
+        </div>
+        <div class="slds-grid slds-gutters slds-wrap">
+            <div class="slds-col slds-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12">
+                <div class="cc-col-field-values">
+                    <lightning-input name="altPhone" type="phone" label="Alternate Phone Number" value={personInformation.altPhone}
+                        onchange={handleChange} disabled>
+                    </lightning-input>
+                </div>
+            </div>
+            <div class="slds-col slds-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12">
+                <div class="cc-col-field-values">
+                    <lightning-radio-group  name="altPhoneType" label="Alternate Phone Number Type" options={phoneTypeOptions} class="radio-group m-b-medium"
+                        value={personInformation.altPhoneType} type="radio" disabled>
+                    </lightning-radio-group>
+                </div>
+            </div>
+        </div>
+    </template>
+</template>
